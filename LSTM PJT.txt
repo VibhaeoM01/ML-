@@ -1,0 +1,103 @@
+STEP 1 -- Jokes=""" """
+
+
+
+STEP 2- Imported few libraries:
+		import tensorflow as tf
+		from tensorflow.keras.preprocessing.text import Tokenizer
+
+
+STEP 3- Tried to assign unique words with numbers:
+		tokenizer=Tokenizer()
+		tokenizer.fit_on_texts([jokes])
+		tokenizer.word_index
+
+
+STEP 4- Split into sentences
+	CONVERTED sequences of words or sentences into sequences of integer
+
+		for sentence in jokes.split('\n'):
+ 		tokenized_sentence=tokenizer.texts_to_sequences([sentence])[0]
+
+
+STEP 5-	Print these integers 1 by 1 by appending into list one by one:
+  		for i in range(1,len(tokenized_sentence)):
+    		input_sequences.append(tokenized_sentence[:i+1])
+
+
+STEP 6- Added 0 padding 
+		from tensorflow.keras.preprocessing.sequence import pad_sequences
+		padded_input_seq=pad_sequences(input_sequences,maxlen=maxi,padding='pre')
+		padded_input_seq
+
+
+STEP 7- Splitting X and y
+		X=padded_input_seq[:,:-1]
+		y=padded_input_seq[:,-1]
+
+
+STEP 8-  to_categorical   Converts y into onehot enconded matrix
+		from tensorflow.keras.utils import to_categorical
+		y=to_categorical(y,num_classes=227)
+		y.shape
+
+
+STEP 9- importing few more libraries to create a model
+		from tensorflow.keras.models import Sequential
+		from tensorflow.keras.layers import Embedding,LSTM,Dense
+
+
+STEP 10- Creating model
+		model=Sequential()
+		model.add(Embedding(227,100,input_length=17))    #100 dimensions(our choice)
+		model.add(LSTM(150)) #150 nodes in gates of LSTM RNN
+		model.add(Dense(227,activation='softmax'))
+
+
+STEP 11- Compiling model
+		model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])   			 			# cate.cross.entropy because we have multiclass classification
+		model.summary()
+
+
+
+STEP 12- Training model
+		model.fit(X,y,epochs=100)
+
+
+
+STEP 13: LET'S START Predicting next word by 3 steps tokenize,adding 0 padding,predict
+		text="How"
+		#tokenize
+			token_text=tokenizer.texts_to_sequences([text])[0]   # [0] to avoid nested list
+		#padding
+			padding_tt=pad_sequences([token_text],maxlen=17,padding='pre')
+			print(padding_tt)
+		#prediction
+		print(model.predict(padding_tt))
+		pos=np.argmax(model.predict(padding_tt))
+	
+		for word,index in tokenizer.word_index.items():
+  		if index==pos:
+    		print(word)
+
+
+
+STEP 14: LET'S START Predicting next 5 words by 3 steps tokenize,adding 0 padding,predict
+
+		text="How"
+
+		for i in range(5):
+		#tokenize
+			token_text=tokenizer.texts_to_sequences([text])[0]   # [0] to avoid nested list
+		#padding
+			padding_tt=pad_sequences([token_text],maxlen=17,padding='pre')
+			print(padding_tt)
+		#prediction
+		print(model.predict(padding_tt))
+		pos=np.argmax(model.predict(padding_tt))
+	
+		for word,index in tokenizer.word_index.items():
+  		if index==pos:
+    		print(word)
+
+
